@@ -35,11 +35,21 @@ def serverfunc(conn):
     else:
         conn.send('\n\t\t\tYou are User 2\r\n')
     while True:
-        data = conn.recv(1024)
-        if conn==con[0]:            
-            con[1].send("User 1:"+data+'*')
-        elif conn==con[1]:
-            con[0].send("User 2:"+data+'*')
+        try:
+            data = conn.recv(1024)
+            if conn==con[0]:            
+                con[1].send("User 1:"+data+'*')
+            elif conn==con[1]:
+                con[0].send("User 2:"+data+'*')
+        except socket.error as error:
+            if conn==con[0]:
+                del con[0]
+                print "User 1 Status:"
+            elif conn==con[1]:
+                del con[1]
+                print "User 2 Status:"
+            print "Disconnected from the server\nThe Communication won't be possible now.\n"
+            break
  
 #now keep talking with the client
 while 1:
