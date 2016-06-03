@@ -1,0 +1,4 @@
+Client can send message to other client by giving his name at the beginning of each message, i.e "clientname: message".
+Client can add users using "add()" so that if the client sends message without the client name then the message will be gone to all the added clients.
+Similarly client can remove using "remove()" clients from his/her group.
+Client can exit using "exit()" or "quit()"
