@@ -7,6 +7,7 @@ import sys
 from thread import *
 
 con=[]
+name1=[]
 HOST = ''   # Symbolic name meaning all available interfaces
 PORT = 5188 # Arbitrary non-privileged port
  
@@ -28,46 +29,24 @@ print 'Socket now listening'
  
 #Function for handling connections. This will be used to create threads
 def serverfunc(conn):
-    var1=0
         #Sending message to connected client
     conn.send('Welcome to the server. Press Enter to send message\r\nTerminating Commands: "exit()" and "quit()"\r') #send only takes string
-    conn.send("You are now User "+str(con.index(conn)+1)+"\nTotal Users connected are: \n")
-    for i in range(len(con)):
-        conn.send(con[i].recv(1024)+"\n")
     while True:
-        data=conn.recv(1024)
-        #print data
-        if data=='exit()' or data=='quit()':
-            print "User "+str(con.index(conn)+1)+" is disconnected\n"
-            for i in range(len(con)):
-                   # if i<>con.index(conn):
-                con[i].sendall("User "+str(con.index(conn)+1)+" is disconnected\n")
-                #con[i].sendall('Disconnection')
-            del con[con.index(conn)]
-            for i in range(len(con)):
-                   # if i<>con.index(conn):
-                #con[i].sendall("User "+str(con.index(conn)+1)+" is disconnected\n")
-                con[i].sendall('Disconnection')    
-           
-           #conn.sendall('Disconnection')
-                        
-            var1=0
-            #print "Disconnected from the server\nThe Communication won't be possible now.\n"
+        try:
+            data = conn.recv(1024)
+            for i in range(len(name1)):
+                if data.startswith(name1[i]+':'):
+                    con[i].send(name1[con.index(conn)]+":"+data[len(name1[i])+1:]+"\n")
+        except socket.error as error:
+            var=con.index(conn)
+            del con[var]
+            del name1[var]
+            print name1
+            for i in range(len(name1)):
+                con[i].send('\n\nA User has disconnected\nAvailable users are:\n')
+                for j in range(len(name1)):
+                    con[i].send(name1[j]+"\n")
             break
-        else:
-            #data='Disconnection'
-            #data = conn.recv(1024)
-            if data=='Disconnection':
-                conn.send("You are now User "+str(con.index(conn)+1)+"\nTotal Users connected are: \n")
-                for i in range(len(con)):
-                    conn.send(con[i].recv(1024)+"\n")
-               #var1=1
-            
-            #if conn==con[0]:            
-            con[con.index(conn)].send("User "+str(con.index(conn)+1)+":"+data+'*')
-            #elif conn==con[1]:
-            #   con[0].send("User 2:"+data+'*')
-        
  
 #now keep talking with the client
 while 1:
@@ -75,6 +54,13 @@ while 1:
     conn, addr = s.accept()
     print 'Connected with ' + addr[0] + ':' + str(addr[1])
     con.append(conn)
+    name1.append(conn.recv(1024))
+    for i in range(len(name1)):
+        con[i].send('\n\nA User has connected\nAvailable users are:\n')
+        for j in range(len(name1)):
+            con[i].send(name1[j]+"\n")
+    print "Connected Users: "
+    print name1
     #start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
     start_new_thread(serverfunc ,(conn,))
  

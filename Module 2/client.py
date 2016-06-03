@@ -9,17 +9,15 @@ s.connect((host, port))
 def client(null):
 	while True:
 		data= s.recv(1024)
-		if data=='Disconnection':
-                        #print "Some User has Disconnected\n"
-                        s.send('Disconnection')
-		elif not(data.endswith('Disconnection*')):
-                        print str(data)
+		print str(data)
 		
 start_new_thread(client, (0,))
-#s.send('nothing')
+name=raw_input("Enter your username: ")
+s.send(name)
 while True:
 	reply = raw_input()
-        s.send(reply)
 	if reply=='exit()' or reply=="quit()":
                 break
+	else:
+                s.send(reply)
 s.close                     # Close the socket when done
